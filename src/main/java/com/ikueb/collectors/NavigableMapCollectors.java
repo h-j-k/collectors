@@ -94,9 +94,8 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      *         values
      */
-    public static <T extends Comparable<T>, K extends Comparable<K>>
-            Collector<T, ?, NavigableMap<K, T>> toNavigableMap(
-                    Function<? super T, ? extends K> keyMapper) {
+    public static <T, K extends Comparable<K>> Collector<T, ?, NavigableMap<K, T>>
+            toNavigableMap(Function<? super T, ? extends K> keyMapper) {
         return toNavigableMap(keyMapper, identity());
     }
 
@@ -159,7 +158,7 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      *         values
      */
-    public static <T extends Comparable<T>, K extends Comparable<K>>
+    public static <T, K extends Comparable<K>>
             Collector<T, ?, ConcurrentNavigableMap<K, T>> toConcurrentNavigableMap(
                     Function<? super T, ? extends K> keyMapper) {
         return toConcurrentNavigableMap(keyMapper, identity());
