@@ -99,9 +99,9 @@ public class NavigableMapCollectorsTest {
 
     @Test
     public void testKeyMapping() {
-        assertMapOrdering((NavigableMap<Integer, Integer>) IntStream.range(0, 4)
+        assertMapOrdering(IntStream.range(0, 4)
                                     .boxed()
-                                    .collect(toNavigableMap(i -> Integer.valueOf(4 - i))),
+                                    .collect(toNavigableMap(i -> 4 - i)),
                             asNavigableMap(1, 3, 2, 2, 3, 1, 4, 0));
     }
 
@@ -147,7 +147,7 @@ public class NavigableMapCollectorsTest {
     public void testConcurrentKeyMapping() {
         assertMapOrdering((NavigableMap<Integer, Integer>) IntStream.range(0, 4)
                                     .boxed()
-                                    .collect(toConcurrentNavigableMap(i -> Integer.valueOf(4 - i))),
+                                    .collect(toConcurrentNavigableMap(i -> 4 - i)),
                             asNavigableMap(1, 3, 2, 2, 3, 1, 4, 0));
     }
 

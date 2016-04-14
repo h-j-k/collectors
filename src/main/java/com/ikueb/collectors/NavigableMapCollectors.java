@@ -79,7 +79,7 @@ public final class NavigableMapCollectors {
 
     /**
      * @param comparator the {@link Comparator} to use
-     * @return a new {@link ConcurrentNavigableMap}
+     * @return a new {@link ConcurrentNavigableMap} object
      */
     private static <K, V> Supplier<ConcurrentNavigableMap<K, V>>
             supplyConcurrent(Comparator<? super K> comparator) {
@@ -96,7 +96,7 @@ public final class NavigableMapCollectors {
      */
     public static <T, K extends Comparable<K>> Collector<T, ?, NavigableMap<K, T>>
             toNavigableMap(Function<? super T, ? extends K> keyMapper) {
-        return toNavigableMap(keyMapper, identity());
+        return toNavigableMap(keyMapper, i -> i);
     }
 
     /**
@@ -161,7 +161,7 @@ public final class NavigableMapCollectors {
     public static <T, K extends Comparable<K>>
             Collector<T, ?, ConcurrentNavigableMap<K, T>> toConcurrentNavigableMap(
                     Function<? super T, ? extends K> keyMapper) {
-        return toConcurrentNavigableMap(keyMapper, identity());
+        return toConcurrentNavigableMap(keyMapper, i -> i);
     }
 
     /**
