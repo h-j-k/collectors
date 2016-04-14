@@ -96,7 +96,7 @@ public final class NavigableMapCollectors {
      */
     public static <T, K extends Comparable<K>> Collector<T, ?, NavigableMap<K, T>>
             toNavigableMap(Function<? super T, ? extends K> keyMapper) {
-        return toNavigableMap(keyMapper, i -> i);
+        return toNavigableMap(keyMapper, identity());
     }
 
     /**
@@ -161,7 +161,7 @@ public final class NavigableMapCollectors {
     public static <T, K extends Comparable<K>>
             Collector<T, ?, ConcurrentNavigableMap<K, T>> toConcurrentNavigableMap(
                     Function<? super T, ? extends K> keyMapper) {
-        return toConcurrentNavigableMap(keyMapper, i -> i);
+        return toConcurrentNavigableMap(keyMapper, identity());
     }
 
     /**
