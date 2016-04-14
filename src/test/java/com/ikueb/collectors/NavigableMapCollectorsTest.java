@@ -101,7 +101,7 @@ public class NavigableMapCollectorsTest {
     public void testKeyMapping() {
         assertMapOrdering(IntStream.range(0, 4)
                                     .boxed()
-                                    .collect(toNavigableMap(i -> 4 - i)),
+                                    .collect(toNavigableMap(i -> Integer.valueOf(4 - i))),
                             asNavigableMap(1, 3, 2, 2, 3, 1, 4, 0));
     }
 
