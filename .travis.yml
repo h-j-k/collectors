@@ -18,6 +18,3 @@ deploy:
 after_success:
 - gradle generateJavadoc && cp "$TRAVIS_BUILD_DIR/README.md" "$TRAVIS_BUILD_DIR/build/docs"
 - gradle jacocoTestReport && bash <(curl -s https://codecov.io/bash)
-env:
-  global:
-    secure: Y4yeNQQIRt81hVMl87T7mV6g0oQw/cR7szH9NSB/4pAvRdtz80jL6QrUYuFUBtCzNVYWjtZt+XlODkfFxxPTBIDOMHWIaqJWX/k24VdQFPHlwYE/N4BeppfoBHRTWzqwzWqOCz3cBA9SsdCW91qI5Mc3Pr3Szh76gh4bWnRo6cx4wg31zNrTleGTPk4Ypk07hVYWPF70ukhKK2HYgpfhQfNdyCRMdVpHIqqeq/f1aQGtER+DYCaGGL5V8Wtdtg+3LNdwJYUSd0ZXoszViHNG9BiLd2TSy5jJY00On0p4mdWAYmjgaDU73D51rqKIc7yEqVH2L5yNFS7Hgs4NNkeCoT8YFF/CsWBi6NN4GNTWFF1a6mowZ+pOKBDzFgM7EQa0Fvwnmkqklfr1PVc4kaCum6/upiJx33yLYc8rcZackHipySUft8Iih6Gy8wKmeFe83tE9RJ5bed7w7lx/9Gbb20tay0rUXntu/srYZezJLcSbL1HWfmp2h51tcRkQ0zfO3V8gOA3uTk7t9lJsyypsKSJLLXGg68ALt4h1lsU3Ne74wj6nbhxrfU6BzcPp/cf43SWGR7aGXeDKF0YDitxITHRepz+gcTWWruG8DjhlBD+Td6yDwOls7/QJ2/lhEnMS1gzuikUz+UGKzklHQZvu3g4lSiW8h0BLlhFx09z1qE4=
