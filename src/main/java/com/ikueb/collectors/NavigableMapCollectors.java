@@ -55,7 +55,7 @@ public final class NavigableMapCollectors {
     /**
      * @return a {@link Collector} suitable for thread-safe {@link List} operations
      */
-    private static <T> Collector<T, ?, List<T>> toConcurrentList() {
+    private static <T> Collector<T, List<T>, List<T>> toConcurrentList() {
         return Collector.of(CopyOnWriteArrayList::new, List::add,
                             (a, b) -> { a.addAll(b); return a; },
                             CHARACTERISTICS);
@@ -94,7 +94,7 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      *         values
      */
-    public static <T, K extends Comparable<K>> Collector<T, ?, NavigableMap<K, T>>
+    public static <T, K extends Comparable<K>> Collector<T, ? extends Object, NavigableMap<K, T>>
             toNavigableMap(Function<? super T, ? extends K> keyMapper) {
         return toNavigableMap(keyMapper, identity());
     }
@@ -107,7 +107,7 @@ public final class NavigableMapCollectors {
      * @param valueMapper the {@link Function} to map a stream element as the target value
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    public static <T, K extends Comparable<K>, V> Collector<T, ?, NavigableMap<K, V>>
+    public static <T, K extends Comparable<K>, V> Collector<T, ? extends Object, NavigableMap<K, V>>
             toNavigableMap(
                     Function<? super T, ? extends K> keyMapper,
                     Function<? super T, ? extends V> valueMapper) {
@@ -124,7 +124,7 @@ public final class NavigableMapCollectors {
      *            {@link NavigableMap}
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    public static <T, K, V> Collector<T, ?, NavigableMap<K, V>> toNavigableMap(
+    public static <T, K, V> Collector<T, ? extends Object, NavigableMap<K, V>> toNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator) {
@@ -142,7 +142,7 @@ public final class NavigableMapCollectors {
      * @param mergeOperator the {@link BinaryOperator} to use for merging values
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    public static <T, K, V> Collector<T, ?, NavigableMap<K, V>> toNavigableMap(
+    public static <T, K, V> Collector<T, ? extends Object, NavigableMap<K, V>> toNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator,
