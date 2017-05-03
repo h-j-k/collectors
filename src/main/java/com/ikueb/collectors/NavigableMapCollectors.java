@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 h-j-k. All Rights Reserved.
+ * Copyright 2017 h-j-k. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,20 @@
  */
 package com.ikueb.collectors;
 
-import static java.util.Comparator.naturalOrder;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.groupingByConcurrent;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+
+import static java.util.Comparator.naturalOrder;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.*;
 
 /**
  * Utility class providing a set of {@link Collector} implementations that collect results
@@ -44,22 +37,8 @@ import java.util.stream.Collector;
  */
 public final class NavigableMapCollectors {
 
-    private static final Collector.Characteristics[] CHARACTERISTICS = {
-            Collector.Characteristics.CONCURRENT,
-            Collector.Characteristics.IDENTITY_FINISH };
-
     private NavigableMapCollectors() {
         // empty
-    }
-
-    /**
-     * @return a {@link Collector} suitable for thread-safe {@link List} operations
-     */
-    @SuppressWarnings("unchecked")
-    private static <T> Collector<T, ?, List<T>> toConcurrentList() {
-        return Collector.of(CopyOnWriteArrayList::new, List::add,
-                            (a, b) -> { a.addAll(b); return a; },
-                            CHARACTERISTICS);
     }
 
     /**
@@ -331,8 +310,7 @@ public final class NavigableMapCollectors {
                     Comparator<? super K> keyComparator,
                     Comparator<? super V> valueComparator) {
         return groupingByConcurrent(keyMapper, supplyConcurrent(keyComparator),
-                    collectingAndThen(mapping(valueMapper, toConcurrentList()),
-                        list -> list.stream().sorted(valueComparator)
-                                    .collect(toConcurrentList())));
+                    collectingAndThen(mapping(valueMapper, toList()),
+                        list -> list.stream().sorted(valueComparator).collect(toList())));
     }
 }

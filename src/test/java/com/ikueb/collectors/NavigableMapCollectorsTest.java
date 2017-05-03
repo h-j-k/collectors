@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 h-j-k. All Rights Reserved.
+ * Copyright 2017 h-j-k. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,54 +15,45 @@
  */
 package com.ikueb.collectors;
 
-import static com.ikueb.collectors.NavigableMapCollectors.groupAndSortBy;
-import static com.ikueb.collectors.NavigableMapCollectors.groupAndSortByConcurrent;
-import static com.ikueb.collectors.NavigableMapCollectors.toConcurrentNavigableMap;
-import static com.ikueb.collectors.NavigableMapCollectors.toNavigableMap;
+import org.testng.annotations.Test;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static com.ikueb.collectors.NavigableMapCollectors.*;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonMap;
+import static java.util.Comparator.naturalOrder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.fail;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.testng.annotations.Test;
-
 public class NavigableMapCollectorsTest {
 
     @SafeVarargs
-    private static <T> Map<T, List<T>> toMap(T... values) {
-        return Collections.singletonMap(values[0],
-                Arrays.stream(values).skip(1).collect(Collectors.toList()));
+    private static <K, V> Map<K, List<V>> toMap(K key, V... values) {
+        return singletonMap(key, stream(values).collect(Collectors.toList()));
     }
 
     @SafeVarargs
     private static <T extends Comparable<T>> NavigableMap<T, List<T>> combineToNavigableMap(
             Map<T, List<T>>... maps) {
-        return combineToNavigableMap(Comparator.naturalOrder(), maps);
+        return combineToNavigableMap(naturalOrder(), maps);
     }
 
     @SafeVarargs
     private static <T> NavigableMap<T, List<T>> combineToNavigableMap(
             Comparator<? super T> comparator, Map<T, List<T>>... maps) {
         NavigableMap<T, List<T>> results = new TreeMap<>(comparator);
-        Arrays.stream(maps).forEach(results::putAll);
+        stream(maps).forEach(results::putAll);
         return results;
     }
 
     @SafeVarargs
-    private static <T extends Comparable<T>> NavigableMap<T, T> asNavigableMap(
-            T... values) {
-        return asNavigableMap(Comparator.naturalOrder(), values);
+    private static <T extends Comparable<T>> NavigableMap<T, T> asNavigableMap(T... values) {
+        return asNavigableMap(naturalOrder(), values);
     }
 
     @SafeVarargs
@@ -71,7 +62,7 @@ public class NavigableMapCollectorsTest {
         if (values.length % 2 != 0) {
             throw new IllegalArgumentException("Input length must be even.");
         }
-        Iterator<T> iterator = Arrays.stream(values).iterator();
+        Iterator<T> iterator = stream(values).iterator();
         NavigableMap<T, T> results = new TreeMap<>(comparator);
         while (iterator.hasNext()) {
             results.put(iterator.next(), iterator.next());
@@ -94,12 +85,11 @@ public class NavigableMapCollectorsTest {
     @Test(expectedExceptions = IllegalStateException.class)
     public void testDuplicateKeyMappingThrows() {
         IntStream.range(0, 4).boxed().collect(toNavigableMap(i -> 0));
-        fail("IllegalStateException expected.");
     }
 
     @Test
     public void testKeyMapping() {
-        assertMapOrdering((NavigableMap<Integer, Integer>) IntStream.range(0, 4)
+        assertMapOrdering(IntStream.range(0, 4)
                                     .boxed()
                                     .collect(toNavigableMap(i -> 4 - i)),
                             asNavigableMap(1, 3, 2, 2, 3, 1, 4, 0));
@@ -140,12 +130,11 @@ public class NavigableMapCollectorsTest {
     @Test(expectedExceptions = IllegalStateException.class)
     public void testDuplicateConcurrentKeyMappingThrows() {
         IntStream.range(0, 4).boxed().collect(toNavigableMap(i -> 0));
-        fail("IllegalStateException expected.");
     }
 
     @Test
     public void testConcurrentKeyMapping() {
-        assertMapOrdering((NavigableMap<Integer, Integer>) IntStream.range(0, 4)
+        assertMapOrdering(IntStream.range(0, 4)
                                     .boxed()
                                     .collect(toConcurrentNavigableMap(i -> 4 - i)),
                             asNavigableMap(1, 3, 2, 2, 3, 1, 4, 0));
