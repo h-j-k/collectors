@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 import static java.util.Comparator.naturalOrder;
@@ -50,24 +49,6 @@ public final class NavigableMapCollectors {
     }
 
     /**
-     * @param comparator the {@link Comparator} to use
-     * @return a new {@link NavigableMap} object
-     */
-    private static <K, V> Supplier<NavigableMap<K, V>>
-    supply(Comparator<? super K> comparator) {
-        return () -> new TreeMap<>(comparator);
-    }
-
-    /**
-     * @param comparator the {@link Comparator} to use
-     * @return a new {@link ConcurrentNavigableMap} object
-     */
-    private static <K, V> Supplier<ConcurrentNavigableMap<K, V>>
-    supplyConcurrent(Comparator<? super K> comparator) {
-        return () -> new ConcurrentSkipListMap<>(comparator);
-    }
-
-    /**
      * Simple one-to-one mapping of stream elements to their keys, given natural
      * ordering on the keys.
      *
@@ -75,9 +56,10 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      * values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>> Collector<T, ?, NavigableMap<K, T>>
-    toNavigableMap(Function<? super T, ? extends K> keyMapper) {
+    public static <T, A,
+            K extends Comparable<K>,
+            M extends NavigableMap<K, T>> Collector<T, A, M> toNavigableMap(
+            Function<? super T, ? extends K> keyMapper) {
         return toNavigableMap(keyMapper, identity());
     }
 
@@ -89,9 +71,9 @@ public final class NavigableMapCollectors {
      * @param valueMapper the {@link Function} to map a stream element as the target value
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>, V> Collector<T, ?, NavigableMap<K, V>>
-    toNavigableMap(
+    public static <T, A,
+            K extends Comparable<K>, V,
+            M extends NavigableMap<K, V>> Collector<T, A, M> toNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper) {
         return toNavigableMap(keyMapper, valueMapper, naturalOrder());
@@ -107,8 +89,8 @@ public final class NavigableMapCollectors {
      *                      {@link NavigableMap}
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K, V> Collector<T, ?, NavigableMap<K, V>> toNavigableMap(
+    public static <T, A, K, V,
+            M extends NavigableMap<K, V>> Collector<T, A, M> toNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator) {
@@ -127,12 +109,14 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and values
      */
     @SuppressWarnings("unchecked")
-    public static <T, K, V> Collector<T, ?, NavigableMap<K, V>> toNavigableMap(
+    public static <T, A, K, V,
+            M extends NavigableMap<K, V>> Collector<T, A, M> toNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator,
             BinaryOperator<V> mergeOperator) {
-        return toMap(keyMapper, valueMapper, mergeOperator, supply(keyComparator));
+        return (Collector<T, A, M>) toMap(keyMapper, valueMapper, mergeOperator,
+                () -> (M) new TreeMap<K, List<V>>(keyComparator));
     }
 
     /**
@@ -143,9 +127,9 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      * values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>>
-    Collector<T, ?, ConcurrentNavigableMap<K, T>> toConcurrentNavigableMap(
+    public static <T, A,
+            K extends Comparable<K>,
+            M extends ConcurrentNavigableMap<K, T>> Collector<T, A, M> toConcurrentNavigableMap(
             Function<? super T, ? extends K> keyMapper) {
         return toConcurrentNavigableMap(keyMapper, identity());
     }
@@ -158,9 +142,9 @@ public final class NavigableMapCollectors {
      * @param valueMapper the {@link Function} to map a stream element as the target value
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>, V>
-    Collector<T, ?, ConcurrentNavigableMap<K, V>> toConcurrentNavigableMap(
+    public static <T, A,
+            K extends Comparable<K>, V,
+            M extends ConcurrentNavigableMap<K, V>> Collector<T, A, M> toConcurrentNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper) {
         return toConcurrentNavigableMap(keyMapper, valueMapper, naturalOrder());
@@ -176,9 +160,8 @@ public final class NavigableMapCollectors {
      *                      {@link NavigableMap}
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K, V> Collector<T, ?, ConcurrentNavigableMap<K, V>>
-    toConcurrentNavigableMap(
+    public static <T, A, K, V,
+            M extends ConcurrentNavigableMap<K, V>> Collector<T, A, M> toConcurrentNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator) {
@@ -199,14 +182,14 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and values
      */
     @SuppressWarnings("unchecked")
-    public static <T, K, V> Collector<T, ?, ConcurrentNavigableMap<K, V>>
-    toConcurrentNavigableMap(
+    public static <T, A, K, V,
+            M extends ConcurrentNavigableMap<K, V>> Collector<T, A, M> toConcurrentNavigableMap(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator,
             BinaryOperator<V> mergeOperator) {
-        return toConcurrentMap(keyMapper, valueMapper, mergeOperator,
-                supplyConcurrent(keyComparator));
+        return (Collector<T, A, M>) toConcurrentMap(keyMapper, valueMapper, mergeOperator,
+                () -> (M) new ConcurrentSkipListMap<K, List<V>>(keyComparator));
     }
 
     /**
@@ -217,9 +200,9 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      * values
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends Comparable<T>, K extends Comparable<K>>
-    Collector<T, ?, NavigableMap<K, List<T>>> groupAndSortBy(
+    public static <T extends Comparable<T>, A,
+            K extends Comparable<K>,
+            M extends NavigableMap<K, List<T>>> Collector<T, A, M> groupAndSortBy(
             Function<? super T, ? extends K> keyMapper) {
         return groupAndSortBy(keyMapper, identity());
     }
@@ -232,9 +215,10 @@ public final class NavigableMapCollectors {
      * @param valueMapper the {@link Function} to map a stream element as the target value
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>, V extends Comparable<V>>
-    Collector<T, ?, NavigableMap<K, List<V>>> groupAndSortBy(
+    public static <T, A,
+            K extends Comparable<K>,
+            V extends Comparable<V>,
+            M extends NavigableMap<K, List<V>>> Collector<T, A, M> groupAndSortBy(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper) {
         return groupAndSortBy(keyMapper, valueMapper, naturalOrder(), naturalOrder());
@@ -251,12 +235,14 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and values
      */
     @SuppressWarnings("unchecked")
-    public static <T, K, V> Collector<T, ?, NavigableMap<K, List<V>>> groupAndSortBy(
+    public static <T, A, K, V,
+            M extends NavigableMap<K, List<V>>> Collector<T, A, M> groupAndSortBy(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator,
             Comparator<? super V> valueComparator) {
-        return groupingBy(keyMapper, supply(keyComparator),
+        return (Collector<T, A, M>) groupingBy(keyMapper,
+                () -> (M) new TreeMap<K, List<V>>(keyComparator),
                 collectingAndThen(mapping(valueMapper, toList()),
                         list -> list.stream().sorted(valueComparator)
                                 .collect(toList())));
@@ -270,9 +256,9 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and the stream elements as
      * values
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends Comparable<T>, K extends Comparable<K>>
-    Collector<T, ?, ConcurrentNavigableMap<K, List<T>>> groupAndSortByConcurrent(
+    public static <T extends Comparable<T>, A,
+            K extends Comparable<K>,
+            M extends ConcurrentNavigableMap<K, List<T>>> Collector<T, A, M> groupAndSortByConcurrent(
             Function<? super T, ? extends K> keyMapper) {
         return groupAndSortByConcurrent(keyMapper, identity());
     }
@@ -285,9 +271,10 @@ public final class NavigableMapCollectors {
      * @param valueMapper the {@link Function} to map a stream element as the target value
      * @return a {@link NavigableMap} with the mapped keys and values
      */
-    @SuppressWarnings("unchecked")
-    public static <T, K extends Comparable<K>, V extends Comparable<V>>
-    Collector<T, ?, ConcurrentNavigableMap<K, List<V>>> groupAndSortByConcurrent(
+    public static <T, A,
+            K extends Comparable<K>,
+            V extends Comparable<V>,
+            M extends ConcurrentNavigableMap<K, List<V>>> Collector<T, A, M> groupAndSortByConcurrent(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper) {
         return groupAndSortByConcurrent(keyMapper, valueMapper,
@@ -305,14 +292,14 @@ public final class NavigableMapCollectors {
      * @return a {@link NavigableMap} with the mapped keys and values
      */
     @SuppressWarnings("unchecked")
-    public static <T, A, K, V, M extends ConcurrentNavigableMap<K, List<V>>> Collector<T, A, M>
-    groupAndSortByConcurrent(
+    public static <T, A, K, V,
+            M extends ConcurrentNavigableMap<K, List<V>>> Collector<T, A, M> groupAndSortByConcurrent(
             Function<? super T, ? extends K> keyMapper,
             Function<? super T, ? extends V> valueMapper,
             Comparator<? super K> keyComparator,
             Comparator<? super V> valueComparator) {
-        Supplier<M> supplier = () -> (M) new ConcurrentSkipListMap<K, List<V>>(keyComparator);
-        return (Collector<T, A, M>) groupingByConcurrent(keyMapper, supplier,
+        return (Collector<T, A, M>) groupingByConcurrent(keyMapper,
+                () -> (M) new ConcurrentSkipListMap<K, List<V>>(keyComparator),
                 collectingAndThen(mapping(valueMapper, toList()),
                         list -> list.stream().sorted(valueComparator).collect(toList())));
     }
