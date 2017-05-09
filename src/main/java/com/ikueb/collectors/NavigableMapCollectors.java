@@ -313,4 +313,9 @@ public final class NavigableMapCollectors {
                     collectingAndThen(mapping(valueMapper, toList()),
                         list -> list.stream().sorted(valueComparator).collect(toList())));
     }
+
+    @SuppressWarnings("unchecked")
+    private static <T, A, R extends List<T>> Collector<T, A, R> asAList() {
+        return (Collector<T, A, R>) toList();
+    }
 }
